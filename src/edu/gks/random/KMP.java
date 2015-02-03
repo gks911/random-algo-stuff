@@ -49,7 +49,7 @@ public class KMP {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		KMP kmp = new KMP("abcdabd");
+		KMP kmp = new KMP("ababacabca");
 		System.out.println(kmp.patternSearch("abcdab abcdabcdabde"));
 	}
 

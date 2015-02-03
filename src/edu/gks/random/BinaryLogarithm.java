@@ -40,13 +40,23 @@ public class BinaryLogarithm {
 		}
 		return p;
 	}
+	
+	public static long exponentiationBySquare(int x, int n){
+		if(n==0) return 1;
+		else if (n==1) return x;
+		else if(n%2==0) return exponentiationBySquare(x*x, n/2);
+		else return x*exponentiationBySquare(x*x, (n-1)/2);
+	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		long x1 = System.currentTimeMillis();
-		System.out.println(binaryLogarithm(6666666));
+		//4294967296
+//		System.out.println(binaryLogarithm(6666666));
+		System.out.println(Math.pow(7, 20));
+//		System.out.println(exponentiationBySquare(7, 20));
 		System.out.println(System.currentTimeMillis()-x1);
 	}
 }

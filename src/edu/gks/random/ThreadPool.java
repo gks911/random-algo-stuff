@@ -10,7 +10,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * @author gaurav
- *
+ * A simple thread pool pattern.
  */
 public class ThreadPool {
 
