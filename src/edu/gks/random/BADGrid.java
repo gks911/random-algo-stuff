@@ -85,7 +85,7 @@ public class BADGrid {
 		}
 		
 		for(int i=0;i<_tmp.size();i++){
-			graph.addEdge(_tmp.get(i), _tmp.get(index));
+//			graph.addEdge(_tmp.get(i), _tmp.get(index));
 		}
 	}
 	

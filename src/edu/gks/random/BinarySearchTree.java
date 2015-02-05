@@ -266,6 +266,38 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		}
 	}
 	
+	public void printTree(){
+		if(root==null) return;
+		int spaces= 1<<height();
+		Queue<BinarySearchTree<Key,Value>.Node> queue = new LinkedList<BinarySearchTree<Key,Value>.Node>();
+		queue.add(root);
+		int levelOne=1,levelTwo=0, curLevel=1,forTime=1;
+		while(!queue.isEmpty()){
+			BinarySearchTree<Key,Value>.Node _tmp=queue.poll();
+			levelOne--;
+			int limit = forTime>1?2:1;
+			for(int i=0;i<limit*(spaces/(1<<curLevel));i++)
+				System.out.print(" ");
+			System.out.print("["+_tmp.key+"]");
+			if(_tmp.left!=null){
+				queue.add(_tmp.left);
+				levelTwo++;
+			}
+			if(_tmp.right!=null){
+				queue.add(_tmp.right);
+				levelTwo++;
+			}
+			if(levelOne==0){
+				System.out.println();
+				levelOne=levelTwo;
+				levelTwo=0;
+				curLevel++;
+				forTime=1;
+			}else
+				forTime++;
+		}
+	}
+	
 	/**
 	 * Will only work for integer keys
 	 * @return
@@ -348,14 +380,14 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<Integer, Integer>();
 		
 		bst.insert(27, 27);
+		bst.insert(8, 8);
 		bst.insert(23, 23);
 		bst.insert(25, 25);
-		bst.insert(8, 8);
 		bst.insert(6, 6);
 		bst.insert(20, 20);
 		bst.insert(2, 2);
-		bst.insert(7, 7);
 		bst.insert(31, 31);
+		bst.insert(7, 7);
 		bst.insert(11, 11);
 		
 		System.out.println(bst.search(311));
@@ -371,6 +403,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		System.out.println("Level Order  Traversal: ");
 		bst.printLevelOrder();
 		System.out.println("IsBST? : "+bst.isBST());
+		bst.printTree();
 		
 	}
 }
