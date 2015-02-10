@@ -70,7 +70,8 @@ public class SuffixArray {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String text="Ask not what your country can do for you ask what you can do for your country";
+//		String text="Ask not what your country can do for you ask what you can do for your country";
+		String text="thiiiis iss a teeest seeentennncccce";
 		SuffixArray sa = new SuffixArray(text);
 		for(int i:sa.suffixArray)
 			System.out.println(text.substring(i));
