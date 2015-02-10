@@ -715,11 +715,107 @@ public class CTCI {
     	return count1+count2;
     }
     
+    /**
+     * Exponentiation by squaring.
+     * Does not handle base cases, eg: 1, -1 etc. Trivial.
+     * @param base
+     * @param exp
+     * @return
+     */
+    public double pow(double base, int exp) {
+    	int result = 1;
+        while (exp != 0)
+        {
+        	//is exp odd?
+            if ((exp & 1) == 1)
+                result *= base;
+            exp >>= 1;
+            base *= base;
+        }
+        return result;
+    }
+    
+    /**
+     * NQueens Problem
+     */
+    int[][] grid;
+    int[] queenX;
+    int res=0;
+
+    public int totalNQueens(int n) {
+    	List<String[]> fin = new ArrayList<String[]>();
+        grid = new int[n][n];
+        queenX = new int[n];;
+        _solveNQueens(n, 0);
+        return res;
+    }
+    
+     private void _solveNQueens(int n, int col){
+        if (col==n){
+            //we have a solution
+            res++;
+        } else{
+            //Find other solutions, if any
+            //for all positions in a row, starting from bottom
+            for(int i=0;i<n;i++){
+                if(canPlaceQueenHere(i,col)){
+                    //safe to place queen here
+                    grid[i][col]=1;
+                    queenX[col]=i;
+                    _solveNQueens(n,col+1);
+                    //backtrack
+                    grid[i][col]=0;
+                    queenX[col]=0;
+                }
+            }
+        }
+    }
+    
+     private boolean canPlaceQueenHere(int row, int col){
+         for(int i=0;i<col;i++){
+             //same row?
+             if (grid[row][i]==1)
+              return false;
+              
+             //same diagonal
+             int rowX=queenX[i];
+             if (Math.abs(col-i)==Math.abs(row-rowX))
+                  return false;
+         }
+         return true;
+      }
+    
+     
+     /**
+      * Can a number be reperesented as a^b
+      * @param n
+      */
+     public void getPerfectPower(long  n){
+    	 int expLimit = BinaryLogarithm.binaryLogarithm(n) + 1;
+    	 Integer[] candidates = new Integer[expLimit-2];
+    	 for(int i=2;i<expLimit;i++)
+    		 candidates[i-2]=i;
+    	 
+    	 for(int i=0;i<candidates.length;i++){
+    		 Integer base=candidates[i];
+    		 for(int j=2;j<expLimit;j++){
+    			 if (pow(base, j)==n){
+    				 System.out.printf("Found: %d ^ %d\n",base,j);
+    				 return;
+    			 }
+    		 }
+    	 }
+    	 System.out.println("Perfect Number not found!");
+     }
+     
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		CTCI c = new CTCI();
+		c.getPerfectPower(1679616l);
+		System.out.println(c.totalNQueens(3));
+		System.out.println(c.pow(4, 6));
 		System.out.println(c.makeChange(10, new int[]{1,5,10,25}));
 		c.compressString("aabcccccaaa");
 		c.twoSum(new long[] { -5, 3, 2, 5, 9, 1, 6, 8 }, -10);
