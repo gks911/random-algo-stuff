@@ -32,10 +32,10 @@ public class SuffixArray {
 		if(low>high) return;
 		int lt=low,gt=high,i=low+1;
 //		int _tmp=text.charAt(suffixArray[low]+n);
-		int _tmp=text[(suffixArray[low]+n)];
+		char _tmp=text[(suffixArray[low]+n)];
 		while(i<=gt){
 //			int _tmp2=text.charAt(suffixArray[i]+n);
-			int _tmp2=text[(suffixArray[i]+n)];
+			char _tmp2=text[(suffixArray[i]+n)];
 			if(_tmp2<_tmp){
 				swap(lt,i); i++;lt++;
 			}else if(_tmp2>_tmp){
@@ -71,7 +71,8 @@ public class SuffixArray {
 	 */
 	public static void main(String[] args) {
 //		String text="Ask not what your country can do for you ask what you can do for your country";
-		String text="thiiiis iss a teeest seeentennncccce";
+//		String text="thiiiis iss a teeest seeentennncccce";
+		String text="banana";
 		SuffixArray sa = new SuffixArray(text);
 		for(int i:sa.suffixArray)
 			System.out.println(text.substring(i));

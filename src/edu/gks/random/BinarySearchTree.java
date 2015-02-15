@@ -3,13 +3,17 @@
  */
 package edu.gks.random;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 /**
  * @author gaurav
  *
  */
+
+
 public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	
 	private class Node{
@@ -23,9 +27,15 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 			this.value=value;
 			this.weight=n;
 		}
+
+		@Override
+		public String toString(){
+			return this.value.toString();
+		}
 	}
 	
 	Node root;
+	Node first=null,prev=null;
 
 	/**
 	 * Weight of the tree rooted at this node
@@ -221,7 +231,7 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	 * @param key2
 	 * @return
 	 */
-	public Key lowestCommonAncestor(Key key1, Key key2){
+	public Key lca(Key key1, Key key2){
 		if (root==null) return null;
 		else
 			return _lca(root, key1, key2).key;
@@ -373,37 +383,271 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		return node;
 	}
 
+	
+	/**
+	 * 1.
+	 * @param node
+	 * @return
+	 */
+	public int sizeOfTree(Node node){
+		if (node==null) return 0;
+		else return sizeOfTree(node.left)+1+sizeOfTree(node.right);
+	}
+	
+	/**
+	 * 2.
+	 * @param root1
+	 * @param root2
+	 * @return
+	 */
+	public boolean isIdentical(Node root1, Node root2){
+		if(root1==null && root2==null) return true;
+		else if(root1!=null && root2!=null && root1.value==root2.value) return (isIdentical(root1.left, root2.left) && isIdentical(root1.right, root2.right));
+		else return false;
+	}
+	
+	/**
+	 * 3.
+	 * @param root
+	 * @return
+	 */
+	public Node mirrorTree(Node root){
+		if(root!=null){
+			mirrorTree(root.left);
+			mirrorTree(root.right);
+			Node _tmp = root.left;
+			root.left=root.right;
+			root.right=_tmp;
+			return root;
+		}
+		return null;
+	}
+	
+	/**
+	 * 4.
+	 * @param root
+	 */
+	public void printRootToLeafPaths(Node root){
+		_printRootToLeafPaths(root,new ArrayList<Node>());
+	}
+	
+	private void _printRootToLeafPaths(Node node,ArrayList<Node> list) {
+		if(node==null) return;
+		if(node.left==null && node.right==null){
+			//we got a leaf node, print the contents of list
+			list.add(node);
+			System.out.println(list);
+			return;
+		}else{
+			list.add(node);
+			ArrayList<Node> _tmpListLeft = new ArrayList<Node>(list);
+			ArrayList<Node> _tmpListRight = new ArrayList<Node>(list);
+			_printRootToLeafPaths(node.left, _tmpListLeft);
+			_printRootToLeafPaths(node.right, _tmpListRight);
+		}
+	}
+
+	/**
+	 * 5.
+	 * Print the lowest common ancestor of two nodes in a Binary Tree
+	 * TODO: Doesn't handle when one key is absent from the tree
+	 * @param node1
+	 * @param node2
+	 */
+	public Node lowestCommonAncestor(Key node1, Key node2){
+		Node lca = _lowestCommonAncestor(root, node1, node2);
+		if(lca!=null)
+			System.out.printf("LCA of %d, %d is : %d\n",node1,node2,lca.key);
+		return lca;	
+	}
+	
+	private Node _lowestCommonAncestor(Node root,Key node1,Key node2) {
+		if(root==null) return null;
+		else if(root.key.compareTo(node1)==0 || root.key.compareTo(node2)==0)
+			return root;
+		else{
+			Node _l = _lowestCommonAncestor(root.left, node1, node2);
+			Node _r = _lowestCommonAncestor(root.right, node1, node2);
+			if (_l!=null && _r!=null) return root;
+			return (_l==null)?_r:_l;
+		}
+	}
+
+	/**
+	 * 6.
+	 * @param root
+	 */
+	public void convertTreeToDLL(Node root){
+		if(root!=null){
+			_convertTreeToDLL(root);
+			Node cur = first;
+			while(cur.right!=first){
+				System.out.print(cur.value+",");
+				cur=cur.right;
+			}
+			System.out.println(cur);
+		}
+	}
+
+	private void _convertTreeToDLL(Node cur) {
+		// base case
+		if (cur == null)
+			return;
+		// traverse in-order
+		_convertTreeToDLL(cur.left);
+		// change pointers here
+		if (prev != null)
+			prev.right = cur;
+		else
+			first=cur;
+
+		Node right = cur.right;
+		cur.right = first;
+		cur.left = prev;
+		first.left = cur;
+		prev = cur;
+		_convertTreeToDLL(right);
+	}
+	
+	/**
+	 * 7.
+	 * @return
+	 */
+	public boolean isBst(){
+		return _isBst(this.root,Integer.MIN_VALUE,Integer.MAX_VALUE);
+	}
+	
+	private boolean _isBst(Node node, int min, int max){
+		if(node==null) return true;
+		if((Integer)node.value < min || (Integer)node.value > max)
+			return false;
+		else
+			return (_isBst(node.left,min,(Integer)node.value)&&(_isBst(node.right,(Integer)node.value,max)));
+	}
+	
+	/**
+	 * 8.
+	 */
+	public void levelOrderSpiral(){
+		Queue<Node> queue = new LinkedList<Node>();
+		List<Node> list = new ArrayList<Node>();
+		int levelOne=0,levelTwo=0;
+		boolean order=false; //true = right to left
+		queue.add(this.root);
+		levelOne++;
+		while(!queue.isEmpty()){
+			Node n = queue.poll();
+			list.add(n);
+			levelOne--;
+			if(n.left!=null){
+				queue.add(n.left);
+				levelTwo++;
+			}
+			if(n.right!=null){
+				queue.add(n.right);
+				levelTwo++;
+			}
+			if(levelOne==0){
+				//time to print
+				if(order){
+					for(int i=list.size()-1;i>=0;i--)
+						System.out.print(list.get(i).value+" ");
+				}else{
+					for(int i=0;i<=list.size()-1;i++)
+						System.out.print(list.get(i).value+" ");
+				}
+				System.out.println();
+				list.clear();
+				levelOne=levelTwo;
+				levelTwo=0;
+				order=(order)?false:true;
+			}
+		}
+	}
+	
+	/**
+	 * 9.
+	 * @param node
+	 * @return
+	 */
+	public boolean childrenSumProperty(Node node){
+		if(node==null || (node.left==null && node.right==null)) return true;
+		else{
+			int left=0, right=0;
+			if(node.left!=null)
+				left=(Integer)node.left.value;
+			if(node.right!=null)
+				right=(Integer)node.right.value;
+			if (childrenSumProperty(node.left) && childrenSumProperty(node.right)
+					&& ((Integer) node.value == left + right))
+				return true;
+			else
+				return false;
+		}
+	}
+	
+	public Node getNode(Key k, Value v){
+		return new Node(k,v,1);
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<Integer, Integer>();
+//		bst.insert(27, 27);
+//		bst.insert(8, 8);
+//		bst.insert(23, 23);
+//		bst.insert(25, 25);
+//		bst.insert(6, 6);
+//		bst.insert(20, 20);
+//		bst.insert(2, 2);
+//		bst.insert(31, 31);
+//		bst.insert(7, 7);
+//		bst.insert(11, 11);
+		bst.insert(9, 9);
 		
-		bst.insert(27, 27);
-		bst.insert(8, 8);
-		bst.insert(23, 23);
-		bst.insert(25, 25);
-		bst.insert(6, 6);
-		bst.insert(20, 20);
-		bst.insert(2, 2);
-		bst.insert(31, 31);
-		bst.insert(7, 7);
-		bst.insert(11, 11);
+		bst.root.left= bst.getNode(7, 7);
+		bst.root.right= bst.getNode(2, 2);
+		bst.root.left.left= bst.getNode(3, 3);
+		bst.root.left.right= bst.getNode(4, 4);
+		bst.root.left.right.right= bst.getNode(4, 4);
 		
-		System.out.println(bst.search(311));
-		System.out.println(bst.floor(322));
-		System.out.println(bst.ceil(29));
-		System.out.println("Rank = "+bst.rank(6));
-		System.out.println("Height = "+bst.height());
-		System.out.println("Diameter = "+bst.diameter());
-		System.out.println("LCA = "+bst.lowestCommonAncestor(1, 111));
-		System.out.println("Level Order  Traversal: ");
-		bst.printLevelOrder();
-		bst.delete(23);
-		System.out.println("Level Order  Traversal: ");
-		bst.printLevelOrder();
-		System.out.println("IsBST? : "+bst.isBST());
-		bst.printTree();
+		
+		System.out.println(bst.childrenSumProperty(bst.root));
+		bst.levelOrderSpiral();
+		System.out.println(bst.isBst());
+		//Note: Destroys the tree
+//		bst.convertTreeToDLL(bst.root);
+		
+//		bst.lowestCommonAncestor(112, 210);
+		
+//		bst.printLevelOrder();
+//		bst.printRootToLeafPaths(bst.root);
+//		bst.mirrorTree(bst.root);
+//		System.out.println("Mirrored:");`
+//		bst.printLevelOrder();
+		
+//		BinarySearchTree<Integer, Integer> bst2 = new BinarySearchTree<Integer, Integer>();
+//		bst2.insert(27, 27);bst2.insert(8, 8);bst2.insert(23, 23);bst2.insert(25, 25);bst2.insert(6, 6);bst2.insert(20, 20);bst2.insert(2, 2);bst2.insert(31, 31);bst2.insert(7, 7);
+//		bst2.insert(11, 11);
+//		System.out.println(bst.isIdentical(bst.root, bst2.root));
+		
+//		System.out.println("Size of tree = "+bst.sizeOfTree(bst.root));		
+//		System.out.println(bst.search(311));
+//		System.out.println(bst.floor(322));
+//		System.out.println(bst.ceil(29));
+//		System.out.println("Rank = "+bst.rank(6));
+//		System.out.println("Height = "+bst.height());
+//		System.out.println("Diameter = "+bst.diameter());
+//		System.out.println("LCA = "+bst.lca(1, 111));
+//		System.out.println("Level Order  Traversal: ");
+//		bst.printLevelOrder();
+//		bst.delete(23);
+//		System.out.println("Level Order  Traversal: ");
+//		bst.printLevelOrder();
+//		System.out.println("IsBST? : "+bst.isBST());
+////		bst.printTree();	
 		
 	}
 }

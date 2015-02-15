@@ -202,6 +202,23 @@ public class CTCI {
 		System.out.println();
 	}
 
+	/**
+	 * Print all combintations of a string
+	 * @param str
+	 */
+	public void printAllSubsets(String str){
+		_printAllSubsets(str,"");
+	}
+	
+	private void _printAllSubsets(String str,String prefix){
+		if(str.isEmpty())
+			System.out.println(prefix);
+		else{
+				_printAllSubsets(str.substring(1), prefix+str.charAt(0));
+				_printAllSubsets(str.substring(1), prefix);
+		}
+	}
+	
 	private void _reverse(char[] arr, int from, int to) {
 		int i = from, j = to;
 		while (i < j) {
@@ -743,7 +760,7 @@ public class CTCI {
     int res=0;
 
     public int totalNQueens(int n) {
-    	List<String[]> fin = new ArrayList<String[]>();
+//    	List<String[]> fin = new ArrayList<String[]>();
         grid = new int[n][n];
         queenX = new int[n];;
         _solveNQueens(n, 0);
@@ -808,15 +825,97 @@ public class CTCI {
     	 System.out.println("Perfect Number not found!");
      }
      
+     
+     /**
+ 	 * print combinations of numbers that add upto target
+ 	 * @param arr
+ 	 * @param target
+ 	 */
+ 	public void setAddUpToN(int[] arr, int target){
+// 		List<Integer> list = new ArrayList<Integer>();
+ 		System.out.println(_setAddUptoN(arr, target, arr.length-1));
+ 	}
+ 	
+ 	private boolean _setAddUptoN(int[]arr, int target, int m){
+ 		if(m<0) return false;
+ 		if (target<0) return false;
+ 		if(target==0){
+ 			//we have a solution
+ 			return true;
+ 		}else{
+ 			//including element at m
+ 			return _setAddUptoN(arr, target - arr[m], m) ||
+ 			//not including element at m
+ 			_setAddUptoN(arr, target, m-1);
+ 		}
+ 	}
+ 	
+ 	/**
+ 	 * 
+ 	 * @param digits
+ 	 * @return
+ 	 */
+ 	Map<Integer,String> t9Map;
+	public List<String> letterCombinations(String digits) {
+		t9Map = new HashMap<Integer, String>();
+		t9Map.put(2, "abc");
+		t9Map.put(3, "def");
+		t9Map.put(4, "ghi");
+		t9Map.put(5, "jkl");
+		t9Map.put(6, "mno");
+		t9Map.put(7, "pqrs");
+		t9Map.put(8, "tuv");
+		t9Map.put(9, "wxyz");
+		List<String> res = new ArrayList<String>();
+		_letterCombinations(digits,0,new StringBuilder(),res);
+		return res;
+	}
+
+	private void _letterCombinations(String digits,int pos, StringBuilder prefix, List<String> res) {
+		//base case
+		if(pos>=digits.length()){
+			//we have a possible combination
+			res.add(prefix.toString());
+			return;
+		}else{
+			int n = Integer.parseInt(Character.toString(digits.charAt(pos)));
+			String candidates = t9Map.get(n);
+			for(int i=0;i<candidates.length();i++){
+				prefix.append(candidates.charAt(i));
+				_letterCombinations(digits, pos+1, prefix, res);
+				prefix.deleteCharAt(prefix.length()-1);
+			}
+		}
+	}
+
+	public int[] knuthShuffle(int[] array){
+		int n = array.length;
+		if(n<=1) return array;
+		for(int i=0;i<n;i++){
+			int _randIdx = i+(int)(Math.random()*(n-i));
+			int _tmp = array[_randIdx];
+			array[_randIdx]=array[i];
+			array[i]=_tmp;
+		}
+		return array;
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		CTCI c = new CTCI();
-		c.getPerfectPower(1679616l);
+		int[] shuffArray = new int[]{1,2,3,4,5,6,7,8,9};
+		c.knuthShuffle(shuffArray);
+		for (int i:shuffArray) System.out.print(i+",");
+		System.out.println();
+		System.out.println(c.letterCombinations("428728"));
+//		c.printAllSubsets("abc");
+		c.setAddUpToN(new int[]{2,5,10,25}, 1);
+		System.out.println(c.makeChange(11, new int[]{1,5,10,25}));
+		c.getPerfectPower(125);
 		System.out.println(c.totalNQueens(3));
 		System.out.println(c.pow(4, 6));
-		System.out.println(c.makeChange(10, new int[]{1,5,10,25}));
 		c.compressString("aabcccccaaa");
 		c.twoSum(new long[] { -5, 3, 2, 5, 9, 1, 6, 8 }, -10);
 //		 System.out.println("Paths="+getNumPaths(0, 0, 3, 3));
@@ -832,11 +931,11 @@ public class CTCI {
 //						{0,0,0}
 //						};
 		
-		int[][] grid = {
-				{0,0},
-				{1,1},
-				{0,0}
-				};
+//		int[][] grid = {
+//				{0,0},
+//				{1,1},
+//				{0,0}
+//				};
 		
 //		System.out.println("With Obstacles : "+c.uniquePathsWithObstacles(grid));
 		
