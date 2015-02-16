@@ -4,6 +4,8 @@
 package edu.gks.random;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -26,6 +28,20 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 			this.key=key;
 			this.value=value;
 			this.weight=n;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public Node(Integer obj) {
+			resetValue(obj, (Class<Value>) Integer.class);
+			resetKey(obj, (Class<Key>) Integer.class);
+		}
+
+		public void resetValue(Integer obj, Class<Value> cls){
+			this.value=cls.cast(obj);
+		}
+		
+		public void resetKey(Integer obj, Class<Key> cls){
+			this.key=cls.cast(obj);
 		}
 
 		@Override
@@ -246,6 +262,14 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		else
 			return node;
 	}
+	
+	public void inOrder(Node node){
+		if(node!=null){
+			inOrder(node.left);
+			System.out.print(node.value+" ");
+			inOrder(node.right);
+		}
+	}
 
 	/**
 	 * Prints the tree in a level ordered way
@@ -276,6 +300,10 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		}
 	}
 	
+	/**
+	 * Prints a weirdly looking tree. 
+	 * TODO: Improve representation.
+	 */
 	public void printTree(){
 		if(root==null) return;
 		int spaces= 1<<height();
@@ -586,6 +614,156 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		}
 	}
 	
+	/**
+	 * 10.
+	 */
+	public void convertTreeToChildSum(){
+		System.out.println("New Root is = "+_convertTreeToChildSum(this.root));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private int _convertTreeToChildSum(Node node){
+		if(node==null || (node.left==null && node.right==null)) return 0;
+		else{
+			_convertTreeToChildSum(node.left);
+			_convertTreeToChildSum(node.right);
+			Integer lVal=0,rVal=0;
+			if(node.left!=null) lVal=(Integer)node.left.value;
+			if(node.right!=null) rVal=(Integer)node.right.value;
+			//Integers ONLY! [ I know what I'm doing ]
+			node.resetValue(new Integer(lVal+rVal),(Class<Value>) Integer.class);
+			return (Integer)node.value;
+		}
+	}
+	
+	/**
+	 * 11.
+	 * Diameter in linear time
+	 */
+	public void getEfficientDiameter(){
+		System.out.println("Diamater of tree = "+_getEfficientDiameter(this.root)[0]);
+	}
+	
+	private int[] _getEfficientDiameter(Node node){
+		//data[0]=diameter, data[1]=height of cur node
+		int[] data = new int[]{0,0};
+		if(node==null) return data;
+		//leaf node
+		if(node.left==null && node.right==null) {
+			data[0]=1;data[1]=1;
+			return data;
+		}
+		else{
+			int[] lData = _getEfficientDiameter(node.left);
+			int[] rData = _getEfficientDiameter(node.right);
+			data[1] = Math.max(lData[1], rData[1])+1; //set height of cur node
+			data[0]=Math.max(lData[1]+1+rData[1],Math.max(lData[0], rData[0])); //set diameter of cur node
+			return data;
+		}
+	}
+	
+	/**
+	 * 12.
+	 * Linear time
+	 * @param root
+	 */
+	public boolean isHeightBalanced(){
+		return (isHeightBalanced(root)[0]==0)?true:false;
+	}
+	
+	private int[] isHeightBalanced(Node node){
+		//data[0]:0 if true, 1 if false. data[1]=height of cur node
+		int[] data = new int[]{0,0};
+		if(node==null) return data;
+		else{
+			int[] lData = isHeightBalanced(node.left);
+			int[] rData = isHeightBalanced(node.right);
+			data[1] = Math.max(lData[1], rData[1])+1;
+			data[0] = (Math.abs(lData[1]-rData[1])>1?1:0)|lData[0]|rData[0];
+			return data;
+		}
+	}
+	
+	/**
+	 * 14.
+	 * @param node
+	 * @param target
+	 * @return
+	 */
+	public boolean rootToLeafSum(Node node, int target){
+		if(node==null) return (target==0);
+		if (target==0) return true;
+		else{
+			return rootToLeafSum(node.left, target-(Integer)node.value) || 
+					rootToLeafSum(node.right, target-(Integer)node.value);
+		}
+	}
+	
+	/**
+	 * 15.
+	 * Given pre-order and in-order, construct the binary tree
+	 * Overall, O(n^2)
+	 * @param preorder
+	 * @param inorder
+	 */
+	public void constructTreeFromPreAndIn(List<Integer> preorder, List<Integer> inorder){
+		int[] cur = new int[]{0};
+		Node root = _constructTreeFromPreAndIn(preorder, inorder, cur);
+		inOrder(root);
+		System.out.println();
+	}
+
+	private Node _constructTreeFromPreAndIn(List<Integer> preorder, List<Integer> inorder, int[] cur) {
+		if (inorder.size() == 0)
+			return null;
+		else {
+			int value = preorder.get(cur[0]);
+			cur[0] += 1;
+			//this takes linear time
+			int splitPt = inorder.indexOf(value);
+			Node root = new Node(value);
+			//sublist is constant time
+			root.left = _constructTreeFromPreAndIn(preorder, inorder.subList(0, splitPt), cur);
+			root.right = _constructTreeFromPreAndIn(preorder, inorder.subList(splitPt + 1, inorder.size()), cur);
+			return root;
+		}
+	}
+	
+	/**
+	 * 16.
+	 * @param node
+	 */
+	public void doubleTree(Node node){
+		if(node==null) return;
+		else{
+			//duplicates nodes in a pre-order fashion
+			Node _tmp = node.left;
+			Node newNode = new Node((Integer)node.value);
+			node.left=newNode;
+			newNode.left=_tmp;
+			doubleTree(node.left.left);
+			doubleTree(node.right);
+		}
+	}
+	
+	public void maximumWidth(){
+		int[] arr = new int[20];
+		_maximumWidth(root, 0, arr);
+		int max=1;
+		for(int i:arr)
+			if(i>max)
+				max=i;
+		System.out.println("Maximum Width = "+max);
+	}
+	
+	private void _maximumWidth(Node node, int assigned, int[] arr){
+		if(node!=null){
+			arr[assigned]++;
+			_maximumWidth(node.left, assigned+1, arr);
+			_maximumWidth(node.right, assigned+1, arr);
+		}
+	}
+	
 	public Node getNode(Key k, Value v){
 		return new Node(k,v,1);
 	}
@@ -595,6 +773,9 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	 */
 	public static void main(String[] args) {
 		BinarySearchTree<Integer, Integer> bst = new BinarySearchTree<Integer, Integer>();
+//		List<Integer> pre = new ArrayList<Integer>(Arrays.asList(new Integer[]{11,7,6,1,4,3,2}));
+//		List<Integer> in = new ArrayList<Integer>(Arrays.asList(new Integer[]{6,7,1,4,3,11,2}));
+//		bst.constructTreeFromPreAndIn(pre, in);
 //		bst.insert(27, 27);
 //		bst.insert(8, 8);
 //		bst.insert(23, 23);
@@ -604,15 +785,24 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 //		bst.insert(2, 2);
 //		bst.insert(31, 31);
 //		bst.insert(7, 7);
-//		bst.insert(11, 11);
-		bst.insert(9, 9);
+		bst.insert(11,11);
 		
 		bst.root.left= bst.getNode(7, 7);
 		bst.root.right= bst.getNode(2, 2);
-		bst.root.left.left= bst.getNode(3, 3);
-		bst.root.left.right= bst.getNode(4, 4);
+		bst.root.left.left= bst.getNode(6, 6);
+		bst.root.left.right= bst.getNode(1,1);
 		bst.root.left.right.right= bst.getNode(4, 4);
+//		bst.root.left.right.right.right= bst.getNode(3, 3);
 		
+		bst.maximumWidth();
+//		bst.doubleTree(bst.root);
+//		bst.inOrder(bst.root);
+		System.out.println("Does sum to : "+bst.rootToLeafSum(bst.root, 23));
+		
+		System.out.println("Is height balanced : "+bst.isHeightBalanced());
+		bst.getEfficientDiameter();
+		
+//		bst.convertTreeToChildSum();
 		
 		System.out.println(bst.childrenSumProperty(bst.root));
 		bst.levelOrderSpiral();
