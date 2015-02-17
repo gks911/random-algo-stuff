@@ -4,8 +4,6 @@
 package edu.gks.random;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -764,6 +762,109 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 		}
 	}
 	
+	/**
+	 * 18.
+	 */
+	public void printSortedFromArrayAsBst(int[] arr){
+		_printSortedFromArrayAsBst(arr,arr.length,0);
+	}
+	
+	private void _printSortedFromArrayAsBst(int[] arr, int length, int i) {
+		if(i<length){
+			_printSortedFromArrayAsBst(arr,length,2*i+1);
+			System.out.println(arr[i]);
+			_printSortedFromArrayAsBst(arr,length,2*i+2);
+		}
+	}
+
+	/**
+	 * 19.
+	 * @param node
+	 * @return
+	 */
+	public Node inorderSuccessor(Node node, Key key){
+		if(node==null) return null;
+		if(node.key.compareTo(key)==0){
+			//keys are equal
+			if(node.right!=null)
+				return _getMin(node.right);
+			else return null;
+		}else if(key.compareTo(node.key)==1)
+			return inorderSuccessor(node.right, key);
+		else{
+			//we are taking a left turn
+			//remember this node
+			Node _tmp = node;
+			Node newNode = inorderSuccessor(node.left, key);
+			if(newNode==null)
+				return _tmp;
+			else 
+				return newNode;
+		}
+	}
+	
+	/**
+	 * 20.
+	 * @param node
+	 * @return
+	 */
+	public Node kthNode(Node node, int k){
+		Node res = _kthNode(node,k,new int[]{0});
+//		System.out.println("Kth Node is = "+res);
+		return res;
+	}
+	
+	private Node _kthNode(Node node, int k, int[] count) {
+		if (node == null) return null;
+		else {
+			_kthNode(node.left, k, count);
+			count[0]++;
+			if (count[0] == k) {
+				System.out.printf("%d Smallest = %d\n",k,node.value);
+				return node;
+			}
+			_kthNode(node.right, k, count);
+		}
+		return null;
+	}
+
+	/**
+	 * 21.
+	 * @param node
+	 * @param key
+	 * @param sb
+	 * @return
+	 */
+	public boolean printAncestors(Node node, Key key, StringBuilder sb){
+		if(node==null) return false;
+		if(key.compareTo(node.key)==-1){
+			sb.append(node.value+"-");
+			return printAncestors(node.left, key,sb);
+		}else if (key.compareTo(node.key)==1){
+			sb.append(node.value+"-");
+			return printAncestors(node.right, key,sb);
+		}else{
+			System.out.println(sb.toString()+node.key);
+			return true;
+		}
+	}
+
+	/**
+	 * 22.
+	 * @param node
+	 * @param min
+	 * @param max
+	 */
+	public void printIntervals(Node node, Key min, Key max){
+		if(node==null) return;
+		if((node.key.compareTo(min)==1 || node.key.compareTo(min)==0) && node.key.compareTo(max)==-1)
+			System.out.println(node.key);
+		if(min.compareTo(node.key)==-1)
+			printIntervals(node.left, min, max);
+		if (max.compareTo(node.key)==1)
+			printIntervals(node.right, min, max);
+	}
+	
 	public Node getNode(Key k, Value v){
 		return new Node(k,v,1);
 	}
@@ -785,14 +886,23 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 //		bst.insert(2, 2);
 //		bst.insert(31, 31);
 //		bst.insert(7, 7);
-		bst.insert(11,11);
+		bst.insert(20,20);
 		
-		bst.root.left= bst.getNode(7, 7);
-		bst.root.right= bst.getNode(2, 2);
-		bst.root.left.left= bst.getNode(6, 6);
-		bst.root.left.right= bst.getNode(1,1);
-		bst.root.left.right.right= bst.getNode(4, 4);
+		bst.root.left= bst.getNode(8, 8);
+		bst.root.right= bst.getNode(22, 22);
+		bst.root.left.left= bst.getNode(4, 4);
+		bst.root.left.right= bst.getNode(12,12);
+		bst.root.left.right.right= bst.getNode(14, 14);
+		bst.root.left.right.left= bst.getNode(10, 10);
 //		bst.root.left.right.right.right= bst.getNode(3, 3);
+
+		bst.printIntervals(bst.root,10,24);
+		
+//		bst.printAncestors(bst.root, 22, new StringBuilder());
+//		bst.kthNode(bst.root, 2);
+		System.out.println("Inorder successor = "+bst.inorderSuccessor(bst.root, 8));
+		
+//		bst.printSortedFromArrayAsBst(new int[]{4,2,5,1,3});
 		
 		bst.maximumWidth();
 //		bst.doubleTree(bst.root);
