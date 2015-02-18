@@ -49,7 +49,6 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	}
 	
 	Node root;
-	Node first=null,prev=null;
 
 	/**
 	 * Weight of the tree rooted at this node
@@ -503,9 +502,11 @@ public class BinarySearchTree<Key extends Comparable<Key>, Value> {
 	 * 6.
 	 * @param root
 	 */
+	Node first=null,prev=null;
 	public void convertTreeToDLL(Node root){
 		if(root!=null){
 			_convertTreeToDLL(root);
+			//printing
 			Node cur = first;
 			while(cur.right!=first){
 				System.out.print(cur.value+",");

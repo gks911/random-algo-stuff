@@ -90,6 +90,29 @@ public class BinarySearchTreeII {
 	}
 
 	/**
+	 * Efficient, no recursion, constant space.
+	 * @param root
+	 */
+	public void levelOrderConnectNodes(TreeNode root){
+		while(root!=null){
+			TreeNode _tmp = new TreeNode(0);
+			TreeNode _cur = _tmp;
+			while(root!=null){
+				if(root.left!=null){
+					_cur.next=root.left;
+					_cur=_cur.next;
+				}
+				if(root.right!=null){
+					_cur.next=root.right;
+					_cur=_cur.next;
+				}
+				root=root.next;
+			}
+			root=_tmp.next;
+		}
+	}
+	
+	/**
 	 * A less than "perfect" method to verify results
 	 * 
 	 * @param root
@@ -163,13 +186,59 @@ public class BinarySearchTreeII {
 		}
 	}
 
+	/**
+	 * 26.
+	 * @param node
+	 */
+	public void boundaryTraversal(TreeNode node){
+		if (node!=null)
+			printLeftBorder(node);
+		
+		printLeaves(node);
+		
+		if (node!=null)
+			printRightBorder(node.right);
+		
+	}
+	
+	private void printLeftBorder(TreeNode node){
+		//does not print the smallest element
+		while(node.left!=null){
+			System.out.println(node.value);
+			node=node.left;
+		}
+	}
+	
+	private void printLeaves(TreeNode node){
+		if(node==null) return;
+		if(node.left==null && node.right==null)
+			System.out.println(node.value);
+		else{
+			printLeaves(node.left);
+			printLeaves(node.right);
+		}
+	}
+	
+	private void printRightBorder(TreeNode node){
+		if(node!=null){
+			printRightBorder(node.right);
+			//print only when not the leaf
+			if(node.left!=null && node.right!=null)
+				System.out.println(node.value);
+		}
+	}
+	
+	
 	public static void main(String[] args) {
 		BinarySearchTreeII bst = new BinarySearchTreeII();
 		TreeNode root = bst.createTree();
-		System.out.println(bst.largestBst(root)[0]);
+//		System.out.println(bst.largestBst(root)[0]);
+		
+		bst.boundaryTraversal(root);
+//		bst.levelOrderConnectNodes(root);
 
-		// bst.connectNodesAtSameLevel(root);
-		// bst.printTreeByLevel(root);
+//		 bst.connectNodesAtSameLevel(root);
+//		 bst.printTreeByLevel(root);
 		// TreeNode prev=new TreeNode();
 		// bst.populateInorderSuccessor(root);
 		// prev=root.left.left.left;
