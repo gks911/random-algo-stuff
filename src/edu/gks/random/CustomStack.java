@@ -8,13 +8,13 @@ package edu.gks.random;
  *
  */
 @SuppressWarnings("unchecked")
-public class Stack<T extends Comparable<T>> {
+public class CustomStack<T extends Comparable<T>> {
 	
 	Object[] buffer;
 	int top;
 	int size;
 	
-	public Stack(int size){
+	public CustomStack(int size){
 		this.size=size;
 		buffer=new Object[size];
 		top=-1;
@@ -45,8 +45,8 @@ public class Stack<T extends Comparable<T>> {
 		return (top<0);
 	}
 	
-	public Stack<Integer> sortStack(Stack<Integer> stack){
-		Stack<Integer> _tmp = new Stack<Integer>(stack.size);
+	public CustomStack<Integer> sortStack(CustomStack<Integer> stack){
+		CustomStack<Integer> _tmp = new CustomStack<Integer>(stack.size);
 		while(!stack.isEmpty()){
 			int _tmpPop=stack.pop();
 			while(!_tmp.isEmpty() && _tmp.peek()<_tmpPop)
@@ -60,11 +60,11 @@ public class Stack<T extends Comparable<T>> {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Stack<Integer> stack = new Stack<Integer>(10);
+		CustomStack<Integer> stack = new CustomStack<Integer>(10);
 		for(int i=0;i<11;i++)
 			stack.push(i);
 		
-		Stack<Integer> sorted = stack.sortStack(stack);
+		CustomStack<Integer> sorted = stack.sortStack(stack);
 		
 		while(!sorted.isEmpty())
 			System.out.println(sorted.pop());

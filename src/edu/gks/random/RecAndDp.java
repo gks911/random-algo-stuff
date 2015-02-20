@@ -326,11 +326,83 @@ public class RecAndDp {
 	}
 	
 	/**
+	 * 
+	 * @param wt
+	 * @param val
+	 * @param W
+	 */
+	public void knapsackDynamic(int[] wt, int[] val, int W){
+		int[][] memo = new int[wt.length+1][W+1];
+		for(int i=0;i<=wt.length;i++){
+			for(int w=0;w<=W;w++){
+				if(i==0||w==0)
+					memo[i][w]=0;
+				else if(wt[i-1]<=w)
+					memo[i][w]=Math.max(val[i-1]+memo[i-1][w-wt[i-1]], memo[i-1][w]);
+				else
+					memo[i][w]=memo[i-1][w];
+			}
+		}
+		System.out.println("Max value in knapsack = "+memo[wt.length][W]);
+	}
+	
+	/**
+	 * Naively, using recursion
+	 * @param str
+	 * @return
+	 */
+	public int minInsertionsForPalindrome(String str){
+		int x = _minInsertionsForPalindrome(str.toCharArray(), 0, str.length()-1);
+		System.out.printf("Min insertions for a palindrome = %d\n",x);
+		return x;
+	}
+	
+	private int _minInsertionsForPalindrome(char[] charArray, int start, int end){
+		if(end<start) return Integer.MAX_VALUE;
+		//eg. 'q'
+		if((end-start)==0) return 0;
+		//eg. ['a','b'] or ['a','a']
+		if(end-start==1) return (charArray[start]==charArray[end])?0:1;
+		//eg. '[a,b,c,a]', now recurse only on '[b,c]'
+		if(charArray[start]==charArray[end])
+			return _minInsertionsForPalindrome(charArray, start+1, end-1);
+		else 
+			return Math.min(_minInsertionsForPalindrome(charArray, start + 1, end),
+					_minInsertionsForPalindrome(charArray, start, end - 1)) + 1;
+	}
+	
+	/**
+	 * Using dynamic programming
+	 * @param str
+	 */
+	public int minInsertForPalindromeDP(String str){
+		if(str.length()==0) {
+			System.out.println("DP Min insertions for a palindrome = "+Integer.MAX_VALUE);
+			return Integer.MAX_VALUE;
+		}
+		int[][] memo = new int[str.length()][str.length()];
+		memo[0][0]=0;
+		for(int i=1;i<str.length();i++){
+			for(int start=0,end=i;end<str.length();start++,end++){
+				if(str.charAt(start)==str.charAt(end))
+					memo[start][end]=memo[start+1][end-1];
+				else
+					memo[start][end]= Math.min(memo[start+1][end], memo[start][end-1])+1;
+			}
+		}
+		System.out.println("DP Min insertions for a palindrome = "+memo[0][str.length()-1]);
+		return memo[0][str.length()-1];
+	}
+	
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		RecAndDp r = new RecAndDp();
-		System.out.println(r.binomialCoefficient(5, 2));
+		r.minInsertionsForPalindrome("topcoder");
+//		r.minInsertForPalindromeDP("abcda");
+//		r.knapsackDynamic(new int[]{1,2,3,4}, new int[]{10,30,40,30}, 4);
+//		System.out.println(r.binomialCoefficient(10, 4));
 //		r.longestCommonSubsequence("aggtab", "gxtxayb");
 //		r.longestCommonSubsequence("abc", "ac");
 //		r.maxDiff(new int[]{2,1,2,0,1});
