@@ -60,14 +60,10 @@ public class Circuits {
 						}
 					}
 			}
-			System.out.println("for "+i);
 			for(int j=0;j<V;j++){
 				if(maxTmp[j]>result)
 					result=maxTmp[j];
-			System.out.print(maxTmp[j]+",");
 			}
-			System.out.println();
-			
 //			System.out.printf("%d max = %d\n",i,result);
 		}
 		return result;
