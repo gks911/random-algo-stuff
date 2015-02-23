@@ -18,7 +18,6 @@ public class QuickSum {
 		return -1;
 	}
 	
-	
 	private void minSumRecur(String number,String prefix, int sum){
 		if(number.isEmpty()&&sum==evalExp(prefix) && (prefix.split("\\+").length-1) < min)
 			min=prefix.split("\\+").length-1;
@@ -50,9 +49,10 @@ public class QuickSum {
 	 */
 	public static void main(String[] args) {
 		QuickSum s = new QuickSum();
+		long start=System.currentTimeMillis();
 		System.out.println(s.minSums("9230560001", 71));
-//		System.out.println(s.evalExp("2+53+4"));
-
+		long end=System.currentTimeMillis();
+		System.out.println("Time taken = "+(end-start));
 	}
 
 }

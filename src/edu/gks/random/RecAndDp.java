@@ -3,8 +3,8 @@
  */
 package edu.gks.random;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gaurav
@@ -233,27 +233,34 @@ public class RecAndDp {
 	 * Length of the longest substring without repeating characters
 	 * @param str
 	 */
-	public void longestNonRepeatingSubstring(char[] str){
-		Set<Character> set = new HashSet<Character>(str.length);
-		int maxTillHere=1;
-		int maxSoFar=1;
-		//initialize
-		set.add(str[0]);
-		for(int i=1;i<str.length;i++){
-			if(set.contains(str[i])){
-				set.clear();
-				maxTillHere=1;
-				set.add(str[i]);
+	public int longestNonRepeatingSubstring(String s){
+		//base cases
+		if(s.length()==0) return 0;
+		if(s.length()==1) return 1;
+
+		Map<Character,Integer> set = new HashMap<Character,Integer>();
+		int max=Integer.MIN_VALUE, cur=0, left=0;
+
+		for(int i=0;i<s.length();i++){
+		    char c=s.charAt(i);
+			if(!set.containsKey(c)){
+				cur+=1;
+				set.put(c,i);
 			}else{
-				maxTillHere=maxTillHere+1;
-				set.add(str[i]);
+			    int tmp=set.get(c)+1;
+			    if(tmp>left)
+			        left=tmp;
+			    set.put(c,i);
+				cur=i-left+1;
 			}
-			
-			if(maxTillHere>maxSoFar)
-				maxSoFar=maxTillHere;
+
+			if(max<cur)
+				max=cur;
 		}
-		System.out.println("Longest Non-repeating substring = "+maxSoFar);
+		System.out.println("Longest Non repeating substring = "+max);
+		return max;
 	}
+	
 	
 	/**
 	 * Greedy approach
@@ -416,7 +423,7 @@ public class RecAndDp {
 //						{4,8,2},
 //						{1,5,3}};
 //		r.minCostPath(grid, 2, 2);
-//		r.longestNonRepeatingSubstring("geeksforgeeks".toCharArray());
+		r.longestNonRepeatingSubstring("dvdf");
 //		int[] arr = new int[25001];
 //		for(int i=25000;i>=0;i--){
 //			arr[25000-i]=i;

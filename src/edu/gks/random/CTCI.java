@@ -900,11 +900,44 @@ public class CTCI {
 		return array;
 	}
 	
+	 public String longestPalindrome(String s) {
+
+		 int n=s.length();
+		   	if(n==1) return s;
+
+		 	int max=1;
+		     String longest=s.substring(0,1);
+
+		 	for(int i=0;i<n-1;i++){
+		 		String str = getLongestPalindrome(s,i,i);
+		 		if(str.length()>max){
+		 			max=str.length();
+		 			longest=str;
+		 		}
+		         String str2 = getLongestPalindrome(s, i, i+1);
+		         if(str2.length()>max){
+		         	max=str2.length();
+		         	longest=str2;
+		         }		
+		 	}
+		 	return longest;
+		  }
+
+		 private String getLongestPalindrome(String str, int l, int r){	
+		 	while(l>=0 && r<str.length() && str.charAt(l)==str.charAt(r)){
+		 		l--;r++;
+		 	}
+		 	assert(l+1>=0);
+		 	assert(r-1<str.length());
+		 		return str.substring(l+1,r);
+		 }
+		 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		CTCI c = new CTCI();
+		System.out.println(c.longestPalindrome("abcdadb"));
 		int[] shuffArray = new int[]{1,2,3,4,5,6,7,8,9};
 		c.knuthShuffle(shuffArray);
 		for (int i:shuffArray) System.out.print(i+",");
