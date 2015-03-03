@@ -4,7 +4,9 @@
 package edu.gks.random;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * @author gaurav
@@ -201,7 +203,32 @@ public class RecAndDp {
 						memo[i-1][j-1] + (str1.charAt(i-1) == str2.charAt(j-1)?0:2));
 			}
 		}
-		System.out.printf("Minimum edit distance = %d",memo[str1.length()][str2.length()]);
+		System.out.printf("Minimum edit distance = %d\n",memo[str1.length()][str2.length()]);
+	}
+	
+	/**
+	 * 
+	 * @param str1
+	 * @param str2
+	 * @param m
+	 * @param n
+	 * @return
+	 */
+	public int editDistanceMemoized(String str1, String str2, int m, int n, int[][] memo){
+		if(m<0&&n<0) return 0;
+		if(m<0) return n;
+		if(n<0) return m;
+		if(memo[m][n]>0)
+			return memo[m][n];
+//		if(str1.charAt(m)==str2.charAt(n)){
+//			memo[m][n]=editDistanceMemoized(str1, str2, m-1, n-1,memo);
+//			return memo[m][n];
+//		}
+		else{
+			 memo[m][n]=Math.min((Math.min(editDistanceMemoized(str1, str2, m, n-1,memo), editDistanceMemoized(str1, str2, m-1, n,memo)))+1,
+					 ((str1.charAt(m)==str2.charAt(n))?0:1)+editDistanceMemoized(str1, str2, m-1, n-1,memo));
+			 return memo[m][n];
+		}
 	}
 	
 	/**
@@ -267,44 +294,40 @@ public class RecAndDp {
 	 * Assuming no negative integers in array
 	 * @param arr
 	 */
-	public void arrayJumpGame(int[] arr){
-		int marker=0;
-		int hops=0;
-		while(marker<arr.length){
-			if(arr[marker]==0)
-				break;
-			if(marker+arr[marker]>=arr.length-1){
-				marker=arr.length-1;
-				break;
-			}
-			marker=getIndexOfBestChoice(marker,arr);
-			hops++;
-		}
-		if(marker==arr.length-1)
-			System.out.println("Number of jumps = "+(hops+1));
-		else
-			System.out.println("Jump not possible!");
-	}
+	public int arrayJumpGame(int[] arr){
+	      if(arr.length==1) return 0;
+	      int maxSoFar=arr[0],curMax=arr[0];
+	      int hops=1;
+	      for(int i=1;i<arr.length;i++){
+	          curMax=Math.max(curMax,arr[i]+i);
+	          if(i==arr.length-1)
+	        	  return (maxSoFar>=arr.length-1)?hops:-1; 
+	          if(i==maxSoFar){
+	              ++hops;
+	              maxSoFar=curMax;
+	          }
+	      }
+	      return 0;
+	    }
 	
-	private int getIndexOfBestChoice(int marker, int[] arr) {
-		if(arr[marker]==1) return marker+1;
-		else{
-			int max=marker+1;
-			for(int i=marker+2;i<=marker+arr[marker] && i<arr.length;i++){
-				if(arr[i]>arr[max])
-					max=i;
-			}
-			return max;
-		}
-	}
-
+	 public boolean canJump(int[] A) {
+	        if(A.length==1) return true;
+	        int maxSoFar=A[0],curMax=A[0];
+	        for(int i=0;i<A.length-1;i++){
+	            curMax=Math.max(A[i]+i,curMax);
+	            if(i==maxSoFar)
+	                maxSoFar=curMax;
+	        }
+	        return maxSoFar>=A.length-1;
+	    }
+	 
 	/**
 	 * Assuming no negative numbers
 	 * @param arr
 	 * @param target
 	 * @return
 	 */
-	public boolean subsetSum(int[] arr, int sum){
+	public boolean coinChange(int[] arr, int sum){
 		int[] memo=new int[sum+1];
 		//initialize
 		memo[0]=1;
@@ -318,6 +341,16 @@ public class RecAndDp {
 			return true;
 		}
 		return false;
+	}
+	
+	public void subsets(int[] arr, int target){
+		
+	}
+	
+	private void _subsets(int[] arr, int target, int idx){
+		if(idx>arr.length)
+			return;
+		
 	}
 	
 	/**
@@ -401,11 +434,67 @@ public class RecAndDp {
 		return memo[0][str.length()-1];
 	}
 	
+	
+	/**
+	 * Calculate the dist to a destination 
+	 * @author gaurav
+	 *
+	 */
+	private class Pair{
+		int x; 
+		int y;
+		public Pair(int x, int y){
+			this.x=x;this.y=y;
+		}
+		@Override
+		public String toString(){
+			return String.format("[%d,%d]", x,y);
+		}
+		@Override
+		public boolean equals(Object obj) {
+			Pair p = (Pair) obj;
+			if(x==p.x&&y==p.y)
+				return true;
+			return false;
+		}
+	}
+	public void knightShortestPath(int srcX, int srcY, int destX, int destY, int m, int n){
+		//handle base cases before proceeding (!)
+		int[] xCand={1,1,2,2,-1,-1,-2,-2};
+		int[] yCand={2,-2,1,-1,2,-2,1,-1};
+		int[][] dist = new int[m][n];
+		boolean[][] visited= new boolean[m][n];
+		Queue<Pair> q = new LinkedList<Pair>();
+		Map<Pair,Pair> path= new HashMap<Pair,Pair>();
+		Pair src = new Pair(srcX,srcY);
+		q.add(src);
+		path.put(src, null);
+		visited[srcX][srcY]=true;
+		
+		while(!q.isEmpty()){
+			Pair p = q.poll();
+			for(int i=0;i<xCand.length;i++){
+				int nx=p.x+xCand[i];
+				int ny=p.y+yCand[i];
+				if (nx >= 0 && ny >= 0 && nx < m && ny < n && !visited[nx][ny]) {
+					Pair neighbor = new Pair(nx, ny);
+					q.add(neighbor);
+					dist[nx][ny] = dist[p.x][p.y] + 1;
+					visited[nx][ny] = true;
+					if (nx == destX && ny == destY)
+						System.out.println("Distance to destination " + dist[nx][ny]);
+				}
+			}
+		}
+		System.out.println();
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		RecAndDp r = new RecAndDp();
+		r.knightShortestPath(0, 0, 0, 2, 3, 3);
 		r.minInsertionsForPalindrome("topcoder");
 //		r.minInsertForPalindromeDP("abcda");
 //		r.knapsackDynamic(new int[]{1,2,3,4}, new int[]{10,30,40,30}, 4);
@@ -418,7 +507,9 @@ public class RecAndDp {
 //		r.longestIncreasingSubequence(new int[]{0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15});
 //		r.efficientLIS(new int[]{0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15});
 //		r.efficientLIS(new int[]{1,3,5,8,9,2,6,7,6,8,9});
-//		r.editDistance("intention", "execution");
+		r.editDistance("intention", "execution");
+		int[][] memo = new int[9][9];
+		System.out.println("Edit Distance recursion = "+r.editDistanceMemoized("intention", "execution",8,8,memo));
 //		int[][] grid = {{1,2,3},
 //						{4,8,2},
 //						{1,5,3}};
@@ -429,8 +520,9 @@ public class RecAndDp {
 //			arr[25000-i]=i;
 //		}
 //		r.arrayJumpGame(arr);
-//		 r.arrayJumpGame(new int[]{4,11,1,1,1,1,1,1,1,1,1,1,1});
-//		r.subsetSum(new int[]{1,5,10,25},100);
+		 System.out.println("No of Jumps = "+r.arrayJumpGame(new int[]{7,0,9,6,9,6,1,7,9,0,1,2,9,0,3}));
+		 System.out.println("Can Jump = "+r.canJump(new int[]{3,2,1,0,4}));
+		r.coinChange(new int[]{2,5,10,25},11);
 	}
 
 }

@@ -234,8 +234,8 @@ public class BinarySearchTreeII {
 		TreeNode root = bst.createTree();
 //		System.out.println(bst.largestBst(root)[0]);
 		
-		bst.boundaryTraversal(root);
-//		bst.levelOrderConnectNodes(root);
+//		bst.boundaryTraversal(root);
+		bst.levelOrderConnectNodes(root);
 
 //		 bst.connectNodesAtSameLevel(root);
 //		 bst.printTreeByLevel(root);

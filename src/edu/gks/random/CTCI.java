@@ -163,6 +163,39 @@ public class CTCI {
 	}
 
 	/**
+	 * No duplicate subsets are returned here
+	 * @param arr
+	 * @return
+	 */
+	public List<List<Integer>> subsetIter(int[] arr){
+		List<List<Integer>> ans = new ArrayList<List<Integer>>();
+		int n = arr.length;
+		if(n==0) return ans;
+		
+		//add the empty subset, then the first element
+		ans.add(new ArrayList<Integer>());
+		ans.add(new ArrayList<Integer>());
+		ans.get(1).add(arr[0]);
+		
+		int prev=1;
+		
+		for(int i=1;i<n;i++){
+			int limit = ans.size();
+			if(arr[i-1]!=arr[i]){
+				prev=limit;
+			}
+			for(int j=limit-prev;j<limit;j++){
+				List<Integer> l = new ArrayList<Integer>(ans.get(j));
+				l.add(arr[i]);
+				ans.add(l);	
+			}
+		}
+		
+		System.out.println(ans);
+		return ans;
+	}
+	
+	/**
 	 * Algo: (from Wikipedia) 1. Find the largest index k such that a[k] < a[k +
 	 * 1]. If no such index exists, the permutation is the last permutation. 2.
 	 * Find the largest index l greater than k such that a[k] < a[l]. 3. Swap
@@ -201,7 +234,14 @@ public class CTCI {
 			System.out.print(arr[i]);
 		System.out.println();
 	}
-
+	
+	private void _reverse(char[] arr, int from, int to) {
+		int i = from, j = to;
+		while (i < j) {
+			_swap(arr, i++, j--);
+		}
+	}
+	
 	/**
 	 * Print all combintations of a string
 	 * @param str
@@ -219,13 +259,6 @@ public class CTCI {
 		}
 	}
 	
-	private void _reverse(char[] arr, int from, int to) {
-		int i = from, j = to;
-		while (i < j) {
-			_swap(arr, i++, j--);
-		}
-	}
-
 	private void _swap(char[] arr, int i, int j) {
 		char _tmp = arr[i];
 		arr[i] = arr[j];
@@ -597,7 +630,7 @@ public class CTCI {
 		//prevent array index out of bounds
 		int i=Math.min(r1-l1,k/2);
 		int j=Math.min(r2-l2,k/2);
-		//disard upper half of b, else discard upper half of a. Adjust k accordingly	
+		//discard upper half of b, else discard upper half of a. Adjust k accordingly	
 		if(a[l1+i-1]>b[l2+j-1]) return _findKSmallestNumber(a, b, l1, r1, l2+j, r2, k-j);
 		else return _findKSmallestNumber(a, b, l1+i, r1, l2, r2, k-i);
 	}
@@ -653,11 +686,10 @@ public class CTCI {
 			if (dict.contains(prefix)) {
 				String suffix = _breakWord(word.substring(i), dict);
 				if (suffix!=null){ 
-					memo.put(word, prefix+" "+suffix);
 					return prefix+" "+suffix;
 				}
 			}
-			}
+		}
 		memo.put(word, null);
 		return null;
 	}
@@ -837,25 +869,28 @@ public class CTCI {
  	}
  	
  	private boolean _setAddUptoN(int[]arr, int target, int m){
- 		if(m<0) return false;
- 		if (target<0) return false;
- 		if(target==0){
- 			//we have a solution
- 			return true;
- 		}else{
- 			//including element at m
- 			return _setAddUptoN(arr, target - arr[m], m) ||
- 			//not including element at m
- 			_setAddUptoN(arr, target, m-1);
- 		}
- 	}
- 	
- 	/**
- 	 * 
- 	 * @param digits
- 	 * @return
- 	 */
- 	Map<Integer,String> t9Map;
+		if (m < 0)
+			return false;
+		if (target < 0)
+			return false;
+		if (target == 0) {
+			// we have a solution
+			return true;
+		} else {
+			// including element at m
+			return _setAddUptoN(arr, target - arr[m], m) ||
+			// not including element at m
+					_setAddUptoN(arr, target, m - 1);
+		}
+	}
+
+	/**
+	 * 
+	 * @param digits
+	 * @return
+	 */
+	Map<Integer, String> t9Map;
+
 	public List<String> letterCombinations(String digits) {
 		t9Map = new HashMap<Integer, String>();
 		t9Map.put(2, "abc");
@@ -867,96 +902,388 @@ public class CTCI {
 		t9Map.put(8, "tuv");
 		t9Map.put(9, "wxyz");
 		List<String> res = new ArrayList<String>();
-		_letterCombinations(digits,0,new StringBuilder(),res);
+		_letterCombinations(digits, 0, new StringBuilder(), res);
 		return res;
 	}
 
-	private void _letterCombinations(String digits,int pos, StringBuilder prefix, List<String> res) {
-		//base case
-		if(pos>=digits.length()){
-			//we have a possible combination
+	private void _letterCombinations(String digits, int pos, StringBuilder prefix, List<String> res) {
+		// base case
+		if (pos >= digits.length()) {
+			// we have a possible combination
 			res.add(prefix.toString());
 			return;
-		}else{
+		} else {
 			int n = Integer.parseInt(Character.toString(digits.charAt(pos)));
 			String candidates = t9Map.get(n);
-			for(int i=0;i<candidates.length();i++){
+			for (int i = 0; i < candidates.length(); i++) {
 				prefix.append(candidates.charAt(i));
-				_letterCombinations(digits, pos+1, prefix, res);
-				prefix.deleteCharAt(prefix.length()-1);
+				_letterCombinations(digits, pos + 1, prefix, res);
+				prefix.deleteCharAt(prefix.length() - 1);
 			}
 		}
 	}
 
-	public int[] knuthShuffle(int[] array){
+	public int[] knuthShuffle(int[] array) {
 		int n = array.length;
-		if(n<=1) return array;
-		for(int i=0;i<n;i++){
-			int _randIdx = i+(int)(Math.random()*(n-i));
+		if (n <= 1)
+			return array;
+		for (int i = 0; i < n; i++) {
+			int _randIdx = i + (int) (Math.random() * (n - i));
 			int _tmp = array[_randIdx];
-			array[_randIdx]=array[i];
-			array[i]=_tmp;
+			array[_randIdx] = array[i];
+			array[i] = _tmp;
 		}
 		return array;
 	}
+
+	public String longestPalindrome(String s) {
+
+		int n = s.length();
+		if (n == 1)
+			return s;
+
+		int max = 1;
+		String longest = s.substring(0, 1);
+
+		for (int i = 0; i < n - 1; i++) {
+			String str = getLongestPalindrome(s, i, i);
+			if (str.length() > max) {
+				max = str.length();
+				longest = str;
+			}
+			String str2 = getLongestPalindrome(s, i, i + 1);
+			if (str2.length() > max) {
+				max = str2.length();
+				longest = str2;
+			}
+		}
+		return longest;
+	}
+
+	private String getLongestPalindrome(String str, int l, int r) {
+		while (l >= 0 && r < str.length() && str.charAt(l) == str.charAt(r)) {
+			l--;
+			r++;
+		}
+		assert (l + 1 >= 0);
+		assert (r - 1 < str.length());
+		return str.substring(l + 1, r);
+	}
+
+	public List<List<Integer>> threeSum(int[] num) {
+		Arrays.sort(num);
+		List<List<Integer>> res = new ArrayList<>();
+		for (int i = 0; i < num.length - 2; i++) {
+			if (i == 0 || num[i] != num[i - 1]) {
+				int l = i + 1, r = num.length - 1;
+				int target = 0 - num[i];
+				while (l < r) {
+					if (num[l] + num[r] == target) {
+						res.add(Arrays.asList(num[i], num[l], num[r]));
+						while (l < r && num[l] == num[l + 1])
+							l++;
+						while (l < r && num[r] == num[r - 1])
+							r--;
+						l++;
+						r--;
+					} else if (num[l] + num[r] < target)
+						l++;
+					else
+						r--;
+				}
+			}
+		}
+		return res;
+	}
+
+	int cur = 0;
+
+	public String getPermutation(int n, int k) {
+		String str = "123456789";
+		return _perm(str.substring(0, n), "", k);
+	}
+
+	private String _perm(String word, String prefix, int k) {
+		if (word.isEmpty()) {
+			if (++cur == k)
+				return prefix;
+			return null;
+		} else {
+			for (int i = 0; i < word.length(); i++) {
+				String tmp = _perm(word.substring(0, i) + word.substring(i + 1), prefix + word.charAt(i), k);
+				if (tmp != null)
+					return tmp;
+			}
+			return null;
+		}
+	}
+
+	public List<String> anagrams(String[] strs) {
+		Set<String> sortedSet = new HashSet<String>();
+		List<String> result = new ArrayList<String>();
+
+		for (String s : strs) {
+			if (!s.isEmpty()) {
+				char[] tmp = s.toCharArray();
+				Arrays.sort(tmp);
+				String strTmp = new String(tmp);
+				if (sortedSet.contains(strTmp))
+					result.add(strTmp);
+				else
+					sortedSet.add(strTmp);
+			} else {
+				// s is empty
+				if (sortedSet.contains(null))
+					result.add(s);
+				else
+					sortedSet.add(null);
+			}
+		}
+		return result;
+	}
+
+	public int trailingZeroes(int n) {
+		long next = 5;
+		int result = 0;
+		while (next <= n) {
+			long x = n/next;
+			System.out.println(next+":"+x);
+			result += x;//Math.floor(n / next);
+			next *= 5;
+		}
+		return result;
+	}
 	
-	 public String longestPalindrome(String s) {
-
-		 int n=s.length();
-		   	if(n==1) return s;
-
-		 	int max=1;
-		     String longest=s.substring(0,1);
-
-		 	for(int i=0;i<n-1;i++){
-		 		String str = getLongestPalindrome(s,i,i);
-		 		if(str.length()>max){
-		 			max=str.length();
-		 			longest=str;
-		 		}
-		         String str2 = getLongestPalindrome(s, i, i+1);
-		         if(str2.length()>max){
-		         	max=str2.length();
-		         	longest=str2;
-		         }		
-		 	}
-		 	return longest;
+	private static class ListNode {
+		      int val;
+		      ListNode next;
+		      @SuppressWarnings("unused")
+			ListNode(int x) {
+		          val = x;
+		          next = null;
+		      }
+		      public String toString(){
+		    	  return val+"";
+		      }
 		  }
+	public ListNode detectCycle(ListNode head) {
+        if(head==null) return null;
+        ListNode slow=head,fast=head;
+        
+        while(fast!=null){
+            if(fast.next==null) return null;
+            slow=slow.next;
+            fast=fast.next.next;
+            if(slow==fast)
+                break;
+        }
+        
+        if(fast==null) return null;
+        
+        //two nodes are at intersection
+        //move slow to head
+        slow=head;
+        while(slow!=fast){
+            slow=slow.next;
+            fast=fast.next;
+        }
+        
+        return fast;
+    }
+	
+	
+	public boolean contiguousSumToT(int[] a,int target){
+		if(a.length==0) return false;
+		int left=0,sum=0;
+		for(int i=0;i<a.length;i++){
+			sum+=a[i];
+			while(left<=i&&sum>target)
+				sum-=a[left++];
+			if(sum==target) return true;
+		}
+		return false;
+	}
+	
+	public int findPeakElement(int[] a) {
+        if(a.length==1) return 0;
+        int left=0,right=a.length-1,mid=0;
+        while(left<=right){
+            mid=left+(right-left)/2;
+            if(mid>left && a[mid]<a[mid-1])
+                right=mid-1;
+            else if(mid<right && a[mid]<a[mid+1])
+                left=mid+1;
+            else 
+                return mid;
+        }
+        return a.length-1;
+    }
+	
+	/**
+	 * rotate matrix by 90 degrees, in-place
+	 * @param matrix
+	 * @return
+	 */
+	public int[][] rotateMatrix(int[][] matrix){
+		//first get the transpose
+		for(int i=0;i<matrix.length;i++){
+			for(int j=i;j<matrix[0].length;j++){
+				//swap row with column
+				int tmp = matrix[i][j];
+				matrix[i][j]=matrix[j][i];
+				matrix[j][i]=tmp;
+			}
+		}
+		
+		//now swap columns
+		int left=0,right=matrix[0].length-1;
+		while(left<right){
+			for(int i=0;i<matrix.length;i++){
+				int tmp = matrix[i][left];
+				matrix[i][left]=matrix[i][right];
+				matrix[i][right]=tmp;
+			}
+			left++;
+			right--;
+		}		
+		return matrix;
+	}
+	
+	/**
+	 * Word Break problem bottom up DP
+	 * @param word
+	 * @param dict
+	 */
+	public void wordBreak(String word, Set<String> dict){
+		boolean[] memo = new boolean[word.length()+1];
+		//initialize  
+		memo[0]=true;
+		for(int i=1;i<=word.length();i++){
+			for(int j=0;j<=i;j++){
+				if(memo[j] && dict.contains(word.substring(j,i))){
+					memo[i]=true;
+					break;
+				}
+			}
+		}
+		System.out.println("Is breakable = "+memo[word.length()]);
+	}
+	
+	public List<String> wordBreakBT(String s, Set<String> dict) {
+        Set<String> memo = new HashSet<String>();
+        System.out.println("Sentence formed = "+isWord(s,dict,memo));
+        return null;
+    }
 
-		 private String getLongestPalindrome(String str, int l, int r){	
-		 	while(l>=0 && r<str.length() && str.charAt(l)==str.charAt(r)){
-		 		l--;r++;
-		 	}
-		 	assert(l+1>=0);
-		 	assert(r-1<str.length());
-		 		return str.substring(l+1,r);
-		 }
-		 
+	Map<String,List<String>> dpMap = new HashMap<String,List<String>>();
+
+	private List<String> isWord(String w, Set<String> dict, Set<String> memo) {
+		List<String> res = new ArrayList<String>();
+		if (dpMap.containsKey(w))
+			return dpMap.get(w);
+		for (int i = 1; i <= w.length(); i++) {
+			String pre = w.substring(0, i);
+			if (dict.contains(pre)) {
+				List<String> suff = isWord(w.substring(i), dict, memo);
+				if (suff.size() == 0 && i == w.length()) {
+					res.add(pre);
+					dpMap.put(w, res);
+					return res;
+				} else {
+					for (String s : suff)
+						res.add(pre + " " + s);
+				}
+				dpMap.put(w, res);
+			}
+		}
+		return res;
+	}
+	
+	public int singleNumber(int[] A) {
+	    int ones = 0, twos = 0;
+	    for(int i = 0; i < A.length; i++){
+	        ones = (ones ^ A[i]) & ~twos;
+	        twos = (twos ^ A[i]) & ~ones;
+	    }
+	    return ones;
+	}
+	
+	public void genAllPoss(String str, String prefix){
+		if(str.isEmpty())
+			System.out.println(prefix);
+		else{
+			genAllPoss(str.substring(1), prefix+"*");
+			genAllPoss(str.substring(1), prefix+str.charAt(0));
+		}
+			
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		CTCI c = new CTCI();
-		System.out.println(c.longestPalindrome("abcdadb"));
-		int[] shuffArray = new int[]{1,2,3,4,5,6,7,8,9};
-		c.knuthShuffle(shuffArray);
-		for (int i:shuffArray) System.out.print(i+",");
-		System.out.println();
-		System.out.println(c.letterCombinations("428728"));
-//		c.printAllSubsets("abc");
-		c.setAddUpToN(new int[]{2,5,10,25}, 1);
-		System.out.println(c.makeChange(11, new int[]{1,5,10,25}));
-		c.getPerfectPower(125);
-		System.out.println(c.totalNQueens(3));
-		System.out.println(c.pow(4, 6));
-		c.compressString("aabcccccaaa");
-		c.twoSum(new long[] { -5, 3, 2, 5, 9, 1, 6, 8 }, -10);
-//		 System.out.println("Paths="+getNumPaths(0, 0, 3, 3));
-		// c.generateSubsets(new int[]{1,2,3});
-
-		c.numPathsDP(0, 0, 6, 6,new int[6][6]);
-		c.getNumPaths(new int[][]{}, 6, 6);
-		System.out.printf("Paths=%d\n",c.path);
+		c.genAllPoss("gaurav", "");
+		System.out.println(c.singleNumber(new int[]{-2,3,-2,-2}));
+		Set<String> dict = new HashSet<String>();
+		dict.add("cat");
+		dict.add("cats");
+		dict.add("sand");
+		dict.add("and");
+		dict.add("andd");
+		dict.add("dogs");
+		dict.add("do");
+		dict.add("gs");
+		c.wordBreakBT("catsanddogs", dict);
+		
+//		int[][] grid = {
+//				{1,2,3,4,5},
+//				{6,7,8,9,10},
+//				{11,12,13,14,15},
+//				{16,17,18,19,20},
+//				{21,22,23,24,25}
+//				};
+//		c.rotateMatrix(grid);
+//		for(int i=0;i<grid.length;i++){
+//			for(int j=0;j<grid[0].length;j++)
+//				System.out.print(grid[i][j]+" ");
+//			System.out.println();
+//		}
+//		System.out.println("Peak element = "+c.findPeakElement(new int[]{1,9,2,3,4,5,6}));
+//		System.out.println("Sum to T? : "+c.contiguousSumToT(new int[]{23,5,4,7,2,11}, 17));
+//		ListNode head = new ListNode(1);
+//		head.next=new ListNode(3);
+//		head.next.next=new ListNode(5);
+//		head.next.next.next=new ListNode(7);
+////		head.next.next.next.next=head.next;
+//		ListNode head2 = new ListNode(2);
+//		c.detectCycle(head);
+//		System.out.println(c.trailingZeroes(4617));
+//		System.out.println(c.anagrams(new String[]{"",""}));
+//		System.out.println("Next permutation = "+c.getPermutation(4, 9));
+//		c.subsetIter(new int[]{1,2,3,3});
+////		c.threeSum(new int[]{7,-1,14,-12,-8,7,2,-15,8,8,-8,-14,-4,-5,7,9,11,-4,-15,-6,1,-14,4,3,10,-5,2,1,6,11,2,-2,-5,-7,-6,2,-15,11,-6,8,-4,2,1,-1,4,-6,-15,1,5,-15,10,14,9,-8,-6,4,-6,11,12,-15,7,-1,-9,9,-1,0,-4,-1,-12,-2,14,-9,7,0,-3,-4,1,-2,12,14,-10,0,5,14,-1,14,3,8,10,-8,8,-5,-2,6,-11,12,13,-7,-12,8,6,-13,14,-2,-5,-11,1,3,-6});
+////		c.threeSum(new int[]{-2,0,1,1,2});
+//		System.out.println(c.longestPalindrome("abcdadb"));
+//		int[] shuffArray = new int[]{1,2,3,4,5,6,7,8,9};
+//		c.knuthShuffle(shuffArray);
+//		for (int i:shuffArray) System.out.print(i+",");
+//		System.out.println();
+//		System.out.println(c.letterCombinations("428728"));
+////		c.printAllSubsets("abc");
+		c.setAddUpToN(new int[]{2,5,10,25}, 7);
+//		System.out.println(c.makeChange(11, new int[]{1,5,10,25}));
+//		c.getPerfectPower(125);
+//		System.out.println(c.totalNQueens(3));
+//		System.out.println(c.pow(4, 6));
+//		c.compressString("aabcccccaaa");
+//		c.twoSum(new long[] { -5, 3, 2, 5, 9, 1, 6, 8 }, -10);
+////		 System.out.println("Paths="+getNumPaths(0, 0, 3, 3));
+//		// c.generateSubsets(new int[]{1,2,3});
+//
+//		c.numPathsDP(0, 0, 6, 6,new int[6][6]);
+//		c.getNumPaths(new int[][]{}, 6, 6);
+//		System.out.printf("Paths=%d\n",c.path);
 
 //		int[][] grid = {
 //						{0,0,0},
@@ -998,39 +1325,19 @@ public class CTCI {
 //		for(int i=1;i<=10;i++)
 //			System.out.printf("%d smallest = %d\n",i,c.findKSmallestNumber(new int[]{1,2,4,8,9,10}, new int[]{3,5,6,7}, 6, 4, i));
 	
-		c.decimalToBinary(.8125);
+//		c.decimalToBinary(.8125);
 		
-		Set<String> dict = new HashSet<String>();
-//		dict.add("dog");
-//		dict.add("arkdo");
-//		dict.add("ant");
-//		dict.add("antark");
-//		dict.add("an");
-//		dict.add("do");
-		dict.add("a");
-		dict.add("aa");
-		dict.add("aaa");
-		dict.add("aaaa");
-		dict.add("aaaaa");
-		dict.add("aaaaaa");
-		dict.add("aaaaaaa");
-		dict.add("aaaaaaaa");
-		dict.add("aaaaaaaaa");
-		dict.add("aaaaaaaaaa");
-		dict.add("aaaaaaaaaaa");
-		dict.add("aaaaaaaaaaaa");
-		dict.add("aaaaaaaaaaaa");
-		dict.add("aaaaaaaaaaaa");
-//		c.breakWordBacktrack("dogantarkdo", dict);
+//		c.breakWordBacktrack("catsanddogs", dict);
 		
 		long start = System.currentTimeMillis();
-		c.breakWordBacktrack("aaaaaaaaaaaab", dict);
-		System.out.println("Backtracking word = "+(System.currentTimeMillis()-start));
+//		c.breakWordBacktrack("aaaaaaaaaaaab", dict);
+//		System.out.println("Backtracking word = "+(System.currentTimeMillis()-start));
 		
 		Map<String,String> memo = new HashMap<String, String>();
 		
 		start = System.currentTimeMillis();
-		System.out.println(c.breakWordDP("aaaaaaaaaaaab", dict, memo));
+		c.breakWordDP("catsanddogs", dict, memo);
+//		System.out.println(c.breakWordDP("aaaaaaaaaaaab", dict, memo));
 		System.out.println("DP word = "+(System.currentTimeMillis()-start));
 //		
 //		c.recursivePermutation("", "ABC");
